@@ -77,7 +77,7 @@ void handle_arguments(int argc, const char* argv[], string& v_ip, string& v_port
 void thread_code() {
     // cerr << "Thread id" << thread::get_id() << endl;
     while (true) {
-        if (sockNum > socket_count) break;
+        // if (sockNum > socket_count) break;
         struct sockaddr_in dest;
         dest.sin_family = AF_INET;
         dest.sin_port = htons(stoi(port));
@@ -98,29 +98,38 @@ void thread_code() {
             fprintf(stderr, "ERROR in connecting: %d\n", errno);
             perror("connecting");
             close(sock);
-            continue;
+            break;
         }
         int value{1};
         nbytes = send(sock, &value, sizeof(value), 0);
         char buffer[1024];
         while (recv(sock, buffer, sizeof(buffer), 0));
+        sleep(3);
         close(sock);
+    }
+}
+
+void exit_thread(){
+    while (true) {
+        int n;
+        cin >> n;
+        if (n == 0)
+            exit(1);
     }
 }
 
 int main(int argc, const char* argv[]) {
     handle_arguments(argc, argv, ip, port);
-    int n = thread::hardware_concurrency();
+    // int n = thread::hardware_concurrency();
+    int n = 20;
     thread* a;
-    a = new thread[n];
+    a = new thread[n + 1];
     for (int i = 0; i < n; i++) {
         a[i] = thread(thread_code);
-        // thread next_thread(thread_code);
-        // threads.push_back(next_thread);
     }
-    for (size_t i{}; i < n;i ++) {
+    a[n] = thread(exit_thread);
+    for (size_t i{}; i < n + 1; i++) {
         a[i].join();
-        // threads[i].join();
     }
     return 0;
 }
