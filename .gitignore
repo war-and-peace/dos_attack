@@ -1,0 +1,8 @@
+# IDE specific
+.vscode/
+.idea/
+
+# Build files
+build/
+cmake-build-debug/
+cmake-build/release/
